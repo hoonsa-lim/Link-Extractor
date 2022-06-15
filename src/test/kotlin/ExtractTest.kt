@@ -8,7 +8,7 @@ class ExtractTest {
     @Test
     fun extract_scheme() {
         val url = "http://d.android.com/tools/testing"
-
+//        val url = " "
         assertEquals("http", linkExtractor.extract(url).scheme)
     }
 
