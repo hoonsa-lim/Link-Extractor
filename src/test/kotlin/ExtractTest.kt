@@ -2,6 +2,7 @@ import com.hoonsalim95.linkextractor.LinkExtractor
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import java.net.MalformedURLException
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -22,9 +23,9 @@ class ExtractTest {
         val link = linkExtractor.extract(url)
 
         //then
-        assertEquals(s, link.scheme)
-        assertEquals(d, link.domain)
-        assertEquals(su, link.subUrl)
+        assertEquals(s, link.url.protocol)
+        assertEquals(d, link.url.authority)
+        assertEquals(su, link.url.file)
     }
 
     @Test
@@ -46,7 +47,7 @@ class ExtractTest {
 
             //when
             val exception = assertThrows<java.lang.IllegalArgumentException> {
-                linkExtractor.extractRegex(url)
+                linkExtractor.extract(url)
             }
 
             //then
@@ -78,7 +79,7 @@ class ExtractTest {
 
             //when
             val exception = assertThrows<java.lang.IllegalArgumentException> {
-                linkExtractor.extractRegex(url)
+                linkExtractor.extract(url)
             }
 
             //then
@@ -102,13 +103,35 @@ class ExtractTest {
 
             //when
             val link = assertDoesNotThrow {
-                linkExtractor.extractRegex(url)
+                linkExtractor.extract(url)
             }
 
             //then
-            assertTrue { (link.scheme ?: "") == "http" || (link.scheme ?: "") == "https" }
-            assertNotNull(link.domain)
-            assertNotNull(link.subUrl)
+            assertTrue { (link.url.protocol ?: "") == "http" || (link.url.protocol ?: "") == "https" }
+            assertNotNull(link.url.authority)
+            assertNotNull(link.url.file)
+        }
+    }
+
+    @Test
+    fun test자바의_URL_객체를_활용한_url_구조분해_및_예외처리(){
+        //given
+        val urls = listOf(
+            "com1231sdf.....",   //x
+            "com..",   //x
+            "com.",   //x
+            "asd.com.",   //x
+            "com.aasd.asd.",   //x
+            "com,aasd,asd,",   //x
+        )
+
+        urls.forEachIndexed { index, url ->
+            //when
+//            val link = linkExtractor.extractURL(url)
+//            println("$index. ${link.toString()}, ${link.scheme}, ${link.domain}, ${link.subUrl}")
+
+            //then
+//            assertTrue { exception is MalformedURLException }
         }
     }
 }

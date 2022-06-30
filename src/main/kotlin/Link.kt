@@ -1,9 +1,9 @@
 package com.hoonsalim95.linkextractor
 
+import java.net.URL
+
 data class Link (
-    val scheme: String? = null,
-    val domain: String? = null,
-    val subUrl: String? = null,
+    val url: URL,
     val faviconUrl: String? = null,
     val title: String? = null,
     val content: String? = null,
