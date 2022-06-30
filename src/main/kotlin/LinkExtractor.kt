@@ -1,5 +1,9 @@
 package com.hoonsalim95.linkextractor
 
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import java.net.URL
 import java.util.regex.Pattern
 
@@ -29,69 +33,30 @@ class LinkExtractor {
         const val DOMAIN_START_SIGN = "://"
         const val PATH_DIVIDER = "/"
     }
-//    fun extractLegacy(url: String?): Link {
-//        if (url.isNullOrBlank()) throw  Exception(MSG_NULL_OR_BLANK)
-//        var scheme: String? = null
-//        var domain: String? = null
-//        var subUrl: String? = null
-//
-//        val result = url.split(DOMAIN_START_SIGN)      //size 0인 경우도 있을 수 있음
-//
-//        when(result.size){
-//            1 -> {
-//                val domainSubUrl = extractDomainSubUrl(result[0])
-//                domain = domainSubUrl.first
-//                subUrl = domainSubUrl.second
-//            }
-//            2 -> {
-//                val domainSubUrl = extractDomainSubUrl(result[1])
-//                scheme = result[0]
-//                domain = domainSubUrl.first
-//                subUrl = domainSubUrl.second
-//            }
-//            else -> {
-//                throw java.lang.Exception("url is only $DOMAIN_START_SIGN, or contains many $DOMAIN_START_SIGN")
-//            }
-//        }
-//
-//        return Link(scheme, domain, subUrl)
-//    }
 
-    private fun extractDomainSubUrl(url: String): Pair<String?, String?>{
-        val result = url.replaceFirst(DOMAIN_START_SIGN, "").split(PATH_DIVIDER)
-
-        return try {
-            Pair(result.firstOrNull(),
-                PATH_DIVIDER + result.filterIndexed { i,_-> i > 0 }.joinToString(PATH_DIVIDER))
-        }catch (e: Exception){
-            Pair(null, null)
+    suspend fun extract(urlText: String?): Link {
+        validationUrl(urlText)
+        val url = URL(urlText)
+        extractFavicon(url).collect {
+            println("extract favicon extract result == $it")
         }
+        return Link(url)
     }
 
-//    fun extractLegacy2(url: String?): Link {
-//        if (url.isNullOrBlank()) throw  IllegalArgumentException(MSG_NULL_OR_BLANK)
-//        if (!url.contains(DOMAIN_START_SIGN)) throw  IllegalArgumentException("$MSG_REQUIRED_SCHEME\nurl == $url")
-//
-//        val result = url.split(DOMAIN_START_SIGN)
-//        if (result.size > 2) throw  IllegalArgumentException("$MSG_NOT_ALLOW_START_SIGN.\nurl == $url")
-//        if (result.size < 2) throw  IllegalArgumentException("$MSG_NOT_ALLOW_URL\nurl == $url")
-//        if (result.first() != "http" && result.first() != "https") throw  IllegalArgumentException("$MSG_NOT_ALLOW_SCHEME\nurl == $url")
-//
-//        val result2 = result[1].split(PATH_DIVIDER, limit = 2)
-//        if (result2.first().split(".").size < 2) throw  IllegalArgumentException("$MSG_NOT_ALLOW_DOMAIN.\nurl == $url")
-//
-//        return Link(result.first(), result2.first(), result2.lastOrNull()?.replaceFirstChar { "$PATH_DIVIDER$it" })
-//    }
-
-    suspend fun extract(url: String?): Link {
-        validationUrl(url)
-        return Link(URL(url))
+    fun extractFavicon(url: URL) : Flow<String> {
+        return flowOf(Jsoup.connect(url.toString()).get())
+            .mapNotNull { it.head() }
+            .map { head -> head.getElementsByTag("link").toList() }
+            .map { links -> links
+                .filter { it.hasAttr("rel") && it.hasAttr("href") }
+                .last { it.attr("rel") == "shortcut icon" || it.attr("rel") == "icon" }
+                .attr("href")           //shortcut icon 으로 찾음
+            }
+            .map { favicon ->
+                if (favicon.contains(DOMAIN_START_SIGN)) favicon
+                else favicon.replaceFirstChar { "${url.protocol + DOMAIN_START_SIGN + url.authority + it}" }
+            }
     }
-
-//    private fun extractURL(urlText: String?): Link{
-//        val url = URL(urlText)
-//        return Link(url.protocol, url.authority, url.file)
-//    }
 
     private fun divideUrl(url: String): Triple<String, String, String?>{
         val schemeAndOther = url.split(DOMAIN_START_SIGN)

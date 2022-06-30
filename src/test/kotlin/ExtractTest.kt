@@ -143,4 +143,18 @@ class ExtractTest {
 //            assertTrue { exception is MalformedURLException }
         }
     }
+
+    @Test
+    fun mainTest(){
+        runBlocking {
+//            val url = "https://yanolja.github.io/"
+//            val url = "https://tech.socarcorp.kr/"
+//            val url = "https://engineering.linecorp.com/ko/blog/"
+//            val url = "https://techblog.yogiyo.co.kr/"
+//            val url = "https://blog.banksalad.com/tech/"
+//            val url = "https://developers-kr.googleblog.com/"
+            val url = "https://techblog.woowahan.com/"
+            linkExtractor.extract(url)
+        }
+    }
 }
