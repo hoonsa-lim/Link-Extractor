@@ -1,7 +1,12 @@
 package com.hoonsalim95.linkextractor
 
+import java.util.regex.Pattern
+
 class LinkExtractor {
     companion object{
+        /**
+         * message
+         */
         const val MSG_NULL_OR_BLANK = "null or blank"
 
         //scheme
@@ -11,6 +16,11 @@ class LinkExtractor {
 
         const val MSG_NOT_ALLOW_URL = "please check url"
         const val MSG_NOT_ALLOW_DOMAIN = "not valid, please check domain"
+
+        /**
+         * regex
+         */
+        val WEB_URL_REGEX: Pattern = Pattern.compile("^(https?):\\/\\/([^:\\/\\s]+)(:([^\\/]*))?((\\/[^\\s/\\/]+)*)?\\/([^#\\s\\?]*)(\\?([^#\\s]*))?(#(\\w*))?$")
     }
     fun extractLegacy(url: String?): Link {
         if (url.isNullOrBlank()) throw  Exception(MSG_NULL_OR_BLANK)
@@ -63,6 +73,15 @@ class LinkExtractor {
         val result2 = result[1].split("/", limit = 2)
         if (result2.first().split(".").size < 2) throw  IllegalArgumentException("$MSG_NOT_ALLOW_DOMAIN.\nurl == $url")
 
+        return Link(result.first(), result2.first(), result2.lastOrNull()?.replaceFirstChar { "/$it" })
+    }
+
+    fun extractRegex(url: String?): Link {
+        if (url.isNullOrBlank()) throw  IllegalArgumentException(MSG_NULL_OR_BLANK)
+        if (WEB_URL_REGEX.matcher(url).matches().not()) throw java.lang.IllegalArgumentException(MSG_NOT_ALLOW_URL)
+
+        val result = url.split("://")
+        val result2 = result[1].split("/", limit = 2)
         return Link(result.first(), result2.first(), result2.lastOrNull()?.replaceFirstChar { "/$it" })
     }
 }
