@@ -1,4 +1,5 @@
 import com.hoonsalim95.linkextractor.LinkExtractor
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -20,12 +21,14 @@ class ExtractTest {
         val url = "$s://$d$su"
 
         //when
-        val link = linkExtractor.extract(url)
+        runBlocking {
+            val link = linkExtractor.extract(url)
 
-        //then
-        assertEquals(s, link.url.protocol)
-        assertEquals(d, link.url.authority)
-        assertEquals(su, link.url.file)
+            //then
+            assertEquals(s, link.url.protocol)
+            assertEquals(d, link.url.authority)
+            assertEquals(su, link.url.file)
+        }
     }
 
     @Test
@@ -47,7 +50,9 @@ class ExtractTest {
 
             //when
             val exception = assertThrows<java.lang.IllegalArgumentException> {
-                linkExtractor.extract(url)
+                runBlocking {
+                    linkExtractor.extract(url)
+                }
             }
 
             //then
@@ -79,7 +84,9 @@ class ExtractTest {
 
             //when
             val exception = assertThrows<java.lang.IllegalArgumentException> {
-                linkExtractor.extract(url)
+                runBlocking {
+                    linkExtractor.extract(url)
+                }
             }
 
             //then
@@ -103,7 +110,9 @@ class ExtractTest {
 
             //when
             val link = assertDoesNotThrow {
-                linkExtractor.extract(url)
+                runBlocking {
+                    linkExtractor.extract(url)
+                }
             }
 
             //then

@@ -83,7 +83,7 @@ class LinkExtractor {
 //        return Link(result.first(), result2.first(), result2.lastOrNull()?.replaceFirstChar { "$PATH_DIVIDER$it" })
 //    }
 
-    fun extract(url: String?): Link {
+    suspend fun extract(url: String?): Link {
         validationUrl(url)
         return Link(URL(url))
     }
