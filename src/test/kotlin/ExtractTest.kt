@@ -6,23 +6,19 @@ class ExtractTest {
     private val linkExtractor = LinkExtractor()
 
     @Test
-    fun extract_scheme() {
-        val url = "http://d.android.com/tools/testing"
-//        val url = " "
-        assertEquals("http", linkExtractor.extract(url).scheme)
-    }
+    fun test_url에서_스킴과_도메인_및_서브url을_추출한다() {
+        //given
+        val s = "https"
+        val d = "m.android.com"
+        val su = "/tools/testing"
+        val url = "$s://$d$su"
 
-    @Test
-    fun extract_domain() {
-        val url = "http://d.android.com/tools/testing"
+        //when
+        val link = linkExtractor.extract(url)
 
-        assertEquals("d.android.com", linkExtractor.extract(url).domain)
-    }
-
-    @Test
-    fun extract_subUrl() {
-        val url = "http://d.android.com/tools/testing"
-
-        assertEquals("/tools/testing", linkExtractor.extract(url).subUrl)
+        //then
+        assertEquals(s, link.scheme)
+        assertEquals(d, link.domain)
+        assertEquals(su, link.subUrl)
     }
 }
