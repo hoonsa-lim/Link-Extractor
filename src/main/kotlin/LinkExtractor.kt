@@ -37,10 +37,11 @@ class LinkExtractor {
     suspend fun extract(urlText: String?): Link {
         validationUrl(urlText)
         val url = URL(urlText)
-        extractFavicon(url).collect {
-            println("extract favicon extract result == $it")
-        }
-        return Link(url)
+
+        return Link(url,
+            faviconUrl = extractFavicon(url).first(),
+            title = extractTitle(url).first()
+        )
     }
 
     fun extractFavicon(url: URL) : Flow<String> {
@@ -55,6 +56,15 @@ class LinkExtractor {
             .map { favicon ->
                 if (favicon.contains(DOMAIN_START_SIGN)) favicon
                 else favicon.replaceFirstChar { "${url.protocol + DOMAIN_START_SIGN + url.authority + it}" }
+            }
+    }
+
+    fun extractTitle(url: URL) : Flow<String> {
+        return flowOf(Jsoup.connect(url.toString()).get())
+            .mapNotNull { it.head() }
+            .map { head -> head.getElementsByTag("title")
+                .firstOrNull()
+                ?.text() ?: url.authority
             }
     }
 

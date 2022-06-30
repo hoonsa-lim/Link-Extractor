@@ -154,7 +154,9 @@ class ExtractTest {
 //            val url = "https://blog.banksalad.com/tech/"
 //            val url = "https://developers-kr.googleblog.com/"
             val url = "https://techblog.woowahan.com/"
-            linkExtractor.extract(url)
+            val linkExtractor = LinkExtractor()
+            val link = linkExtractor.extract("https://m.naver.com/")
+            println("link == $link")
         }
     }
 }

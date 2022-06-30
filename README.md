@@ -1,12 +1,18 @@
 # Link-Extractor
-웹 url을 통해 각종 html 태그를 추출합니다.
 
-## Dependencies 
+## Feature
+1. extract favicon from url
+2. extract title from url
+
+## Dependencies
+1. jsoup
+2. coroutine
+
+## Usage
+### add dependencies (build.gradle) 
 ```groovy
-build.gradle
 
 dependencies {
-    testImplementation 'org.jetbrains.kotlin:kotlin-test'
 
     //html parser
     implementation 'org.jsoup:jsoup:1.15.1'
@@ -16,3 +22,14 @@ dependencies {
 }
 ```
 
+### Code
+```kotlin
+val linkExtractor = LinkExtractor()
+
+runBlocking {
+    val link = linkExtractor.extract("https://m.naver.com/")
+    println("link == $link")
+    
+    //link == Link(url=https://m.naver.com/, faviconUrl=https://m.naver.com/favicon.ico, title=NAVER)
+}
+```

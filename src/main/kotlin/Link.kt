@@ -6,5 +6,4 @@ data class Link (
     val url: URL,
     val faviconUrl: String? = null,
     val title: String? = null,
-    val content: String? = null,
 )
