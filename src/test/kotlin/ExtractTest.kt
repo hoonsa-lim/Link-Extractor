@@ -92,9 +92,6 @@ class ExtractTest {
     fun test_정상URL_추출_시_예외_미발생(){
         //given
         val allowUrl = listOf(
-            "https://mungi.kr/375",
-            "https://yangbox.tistory.com/117",
-            "https://www.baeldung.com/kotlin/throws-annotation",
             "http://www.ktword.co.kr/test/view/view.php?m_temp1=2340",
             "https://www.google.com/search?q=url+%ED%85%8C%EC%8A%BD&rlz=1C5CHFA_enKR984KR984&oq=url+%ED%85%8C%EC%8A%BD&aqs=chrome..69i57j35i39j0i131i433i512j0i20i263i512j0i67i131i433j69i60j69i61j69i60.1462j0j7&sourceid=chrome&ie=UTF-8",
             "https://hoy.kr/_hoy/"
