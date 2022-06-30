@@ -1,8 +1,19 @@
 package com.hoonsalim95.linkextractor
 
 class LinkExtractor {
-    fun extract2(url: String?): Link {
-        if (url.isNullOrBlank()) throw  java.lang.Exception("null or blank")
+    companion object{
+        const val MSG_NULL_OR_BLANK = "null or blank"
+
+        //scheme
+        const val MSG_REQUIRED_SCHEME = "please attach scheme and '://' like 'https://'"
+        const val MSG_NOT_ALLOW_START_SIGN = "not allow. more than two '://' like 'https://'"
+        const val MSG_NOT_ALLOW_SCHEME = "allow only 'http' or 'https'"
+
+        const val MSG_NOT_ALLOW_URL = "please check url"
+        const val MSG_NOT_ALLOW_DOMAIN = "not valid, please check domain"
+    }
+    fun extractLegacy(url: String?): Link {
+        if (url.isNullOrBlank()) throw  Exception(MSG_NULL_OR_BLANK)
         var scheme: String? = null
         var domain: String? = null
         var subUrl: String? = null
@@ -41,15 +52,16 @@ class LinkExtractor {
     }
 
     fun extract(url: String?): Link {
-        if (url.isNullOrBlank()) throw  IllegalArgumentException("null or blank")
-        if (!url.contains("://")) throw  IllegalArgumentException("please attach scheme and '://' like 'https://'\nurl == $url")
+        if (url.isNullOrBlank()) throw  IllegalArgumentException(MSG_NULL_OR_BLANK)
+        if (!url.contains("://")) throw  IllegalArgumentException("$MSG_REQUIRED_SCHEME\nurl == $url")
 
-        val result = url.split("://")      //size 0인 경우도 있을 수 있음
-        if (result.size > 2) throw  IllegalArgumentException("don't allow it. more than two '://'.\nurl == $url")
-        if (result.size < 2) throw  IllegalArgumentException("not valid, please check url.\nurl == $url")
+        val result = url.split("://")
+        if (result.size > 2) throw  IllegalArgumentException("$MSG_NOT_ALLOW_START_SIGN.\nurl == $url")
+        if (result.size < 2) throw  IllegalArgumentException("$MSG_NOT_ALLOW_URL\nurl == $url")
+        if (result.first() != "http" && result.first() != "https") throw  IllegalArgumentException("$MSG_NOT_ALLOW_SCHEME\nurl == $url")
 
         val result2 = result[1].split("/", limit = 2)
-        if (result2.first().split(".").size < 2) throw  IllegalArgumentException("not valid, please check domain.\nurl == $url")
+        if (result2.first().split(".").size < 2) throw  IllegalArgumentException("$MSG_NOT_ALLOW_DOMAIN.\nurl == $url")
 
         return Link(result.first(), result2.first(), result2.lastOrNull()?.replaceFirstChar { "/$it" })
     }
