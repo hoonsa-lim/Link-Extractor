@@ -22,7 +22,7 @@ class ExtractTest {
 
         //when
         runBlocking {
-            val link = linkExtractor.extract(url)
+            val link = linkExtractor.extractAll(url)
 
             //then
             assertEquals(s, link.url.protocol)
@@ -51,7 +51,7 @@ class ExtractTest {
             //when
             val exception = assertThrows<java.lang.IllegalArgumentException> {
                 runBlocking {
-                    linkExtractor.extract(url)
+                    linkExtractor.extractAll(url)
                 }
             }
 
@@ -85,7 +85,7 @@ class ExtractTest {
             //when
             val exception = assertThrows<java.lang.IllegalArgumentException> {
                 runBlocking {
-                    linkExtractor.extract(url)
+                    linkExtractor.extractAll(url)
                 }
             }
 
@@ -111,7 +111,7 @@ class ExtractTest {
             //when
             val link = assertDoesNotThrow {
                 runBlocking {
-                    linkExtractor.extract(url)
+                    linkExtractor.extractAll(url)
                 }
             }
 
@@ -153,9 +153,9 @@ class ExtractTest {
 //            val url = "https://techblog.yogiyo.co.kr/"
 //            val url = "https://blog.banksalad.com/tech/"
 //            val url = "https://developers-kr.googleblog.com/"
-            val url = "https://techblog.woowahan.com/"
+//            val url = "https://techblog.woowahan.com/"
             val linkExtractor = LinkExtractor()
-            val link = linkExtractor.extract("https://m.naver.com/")
+            val link = linkExtractor.extractAll("https://www.google.com/")
             println("link == $link")
         }
     }
