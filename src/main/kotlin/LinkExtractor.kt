@@ -1,9 +1,10 @@
 package com.hoonsalim95.linkextractor
 
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 import java.net.URL
 import java.util.regex.Pattern
 
@@ -34,29 +35,54 @@ class LinkExtractor {
         const val PATH_DIVIDER = "/"
     }
 
-    suspend fun extract(urlText: String?): Link {
+    suspend fun extractAll(urlText: String?): Link {
         validationUrl(urlText)
         val url = URL(urlText)
 
         return Link(url,
-            faviconUrl = extractFavicon(url).first(),
+            faviconUrl = extractFavicon(url),
             title = extractTitle(url).first()
         )
     }
 
-    fun extractFavicon(url: URL) : Flow<String> {
-        return flowOf(Jsoup.connect(url.toString()).get())
-            .mapNotNull { it.head() }
-            .map { head -> head.getElementsByTag("link").toList() }
-            .map { links -> links
-                .filter { it.hasAttr("rel") && it.hasAttr("href") }
-                .last { it.attr("rel") == "shortcut icon" || it.attr("rel") == "icon" }
-                .attr("href")           //shortcut icon 으로 찾음
+    suspend fun extractFavicon(url: URL) : String? {
+        val head = Jsoup.connect(url.toString()).get().head()
+
+        return CoroutineScope(Dispatchers.IO).async {
+            val deferredLink = async { findFaviconFromTag("link", head, url) }
+            val deferredMeta = async { findFaviconFromTag("meta", head, url) }
+            return@async Pair(deferredLink.await(), deferredMeta.await())
+        }.await()?.let {
+            it.first ?: it.second   //link 데이터를 우선으로 하고, null 일 경우 meta 데이터 활용
+        }
+    }
+
+    private fun findFaviconFromTag(tagName: String, head: Element, url: URL): String? {
+        val targetTags = head.getElementsByTag(tagName).toList()
+        when(tagName){
+            "link" -> {
+                return targetTags
+                    .filter { it.hasAttr("rel") && it.hasAttr("href") }
+                    .firstOrNull { it.attr("rel") == "shortcut icon" || it.attr("rel") == "icon" }
+                    ?.attr("href")
+                    ?.let { wholeFavicon -> makePerfectFavicon(wholeFavicon, url) }
             }
-            .map { favicon ->
-                if (favicon.contains(DOMAIN_START_SIGN)) favicon
-                else favicon.replaceFirstChar { "${url.protocol + DOMAIN_START_SIGN + url.authority + it}" }
+            "meta" -> {
+                return targetTags
+                    .filter { it.hasAttr("content") && it.hasAttr("itemprop") }
+                    .firstOrNull { it.attr("itemprop") == "image" && it.attr("content").contains(".png") }
+                    ?.attr("content")
+                    ?.let { wholeFavicon -> makePerfectFavicon(wholeFavicon, url) }
             }
+            else -> return null
+        }
+    }
+
+    private fun makePerfectFavicon(wholeFavicon: String, url: URL): String {
+        return if (wholeFavicon.contains(DOMAIN_START_SIGN))
+            wholeFavicon
+        else
+            wholeFavicon.replaceFirstChar { "${url.protocol + DOMAIN_START_SIGN + url.authority + it}" }
     }
 
     fun extractTitle(url: URL) : Flow<String> {
