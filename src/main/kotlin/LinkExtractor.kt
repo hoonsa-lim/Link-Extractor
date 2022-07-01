@@ -3,7 +3,6 @@ package com.hoonsalim95.linkextractor
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.net.URL
 import java.util.regex.Pattern
@@ -52,7 +51,7 @@ class LinkExtractor {
             val deferredLink = async { findFaviconFromTag("link", head, url) }
             val deferredMeta = async { findFaviconFromTag("meta", head, url) }
             return@async Pair(deferredLink.await(), deferredMeta.await())
-        }.await()?.let {
+        }.await().let {
             it.first ?: it.second   //link 데이터를 우선으로 하고, null 일 경우 meta 데이터 활용
         }
     }
@@ -82,7 +81,7 @@ class LinkExtractor {
         return if (wholeFavicon.contains(DOMAIN_START_SIGN))
             wholeFavicon
         else
-            wholeFavicon.replaceFirstChar { "${url.protocol + DOMAIN_START_SIGN + url.authority + it}" }
+            wholeFavicon.replaceFirstChar { url.protocol + DOMAIN_START_SIGN + url.authority + it }
     }
 
     fun extractTitle(url: URL) : Flow<String> {
