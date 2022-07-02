@@ -22,11 +22,6 @@ dependencies {
 }
 ```
 
-### add android permission (option, AndroidManifest.xml)
-```xml
-<uses-permission android:name="android.permission.INTERNET"/>
-```
-
 ### Code
 ```kotlin
 val linkExtractor = LinkExtractor()
@@ -37,4 +32,10 @@ runBlocking {
     
     //link == Link(url=https://m.naver.com/, faviconUrl=https://m.naver.com/favicon.ico, title=NAVER)
 }
+```
+
+## option android
+### add permission (AndroidManifest.xml)
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
 ```
