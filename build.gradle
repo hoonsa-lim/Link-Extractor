@@ -2,7 +2,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.6.21'
 }
 
-group = 'com.hoonsalim95'
+group = 'com.hoonsalim95'           //maven과 관련이 있는 간가보다?
 version = '0.0.1'
 
 repositories {

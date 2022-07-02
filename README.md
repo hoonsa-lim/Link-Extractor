@@ -22,6 +22,11 @@ dependencies {
 }
 ```
 
+### add android permission (option, AndroidManifest.xml)
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
 ### Code
 ```kotlin
 val linkExtractor = LinkExtractor()
