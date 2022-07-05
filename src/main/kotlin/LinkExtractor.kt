@@ -1,5 +1,6 @@
 package com.hoonsalim95.linkextractor
 
+import com.hoonsalim95.linkextractor.model.Favicon
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.jsoup.Jsoup
@@ -34,17 +35,17 @@ class LinkExtractor {
         const val PATH_DIVIDER = "/"
     }
 
-    suspend fun extractAll(urlText: String?): Link {
+    suspend fun extractFavicon(urlText: String?): Favicon {
         validationUrl(urlText)
         val url = URL(urlText)
 
-        return Link(url,
-            faviconUrl = extractFavicon(url),
-            title = extractTitle(url).first()
+        return Favicon(url,
+            faviconUrl = extractFaviconUrl(url),
+            faviconTitle = extractUrlTitle(url).first()
         )
     }
 
-    suspend fun extractFavicon(url: URL) : String? {
+    suspend fun extractFaviconUrl(url: URL) : String? {
         val head = Jsoup.connect(url.toString()).get().head()
 
         return CoroutineScope(Dispatchers.IO).async {
@@ -64,27 +65,20 @@ class LinkExtractor {
                     .filter { it.hasAttr("rel") && it.hasAttr("href") }
                     .firstOrNull { it.attr("rel") == "shortcut icon" || it.attr("rel") == "icon" }
                     ?.attr("href")
-                    ?.let { wholeFavicon -> makePerfectFavicon(wholeFavicon, url) }
+                    ?.let { wholeFavicon -> makePerfectUrl(wholeFavicon, url) }
             }
             "meta" -> {
                 return targetTags
                     .filter { it.hasAttr("content") && it.hasAttr("itemprop") }
                     .firstOrNull { it.attr("itemprop") == "image" && it.attr("content").contains(".png") }
                     ?.attr("content")
-                    ?.let { wholeFavicon -> makePerfectFavicon(wholeFavicon, url) }
+                    ?.let { wholeFavicon -> makePerfectUrl(wholeFavicon, url) }
             }
             else -> return null
         }
     }
 
-    private fun makePerfectFavicon(wholeFavicon: String, url: URL): String {
-        return if (wholeFavicon.contains(DOMAIN_START_SIGN))
-            wholeFavicon
-        else
-            wholeFavicon.replaceFirstChar { url.protocol + DOMAIN_START_SIGN + url.authority + it }
-    }
-
-    fun extractTitle(url: URL) : Flow<String> {
+    fun extractUrlTitle(url: URL) : Flow<String> {
         return flowOf(Jsoup.connect(url.toString()).get())
             .mapNotNull { it.head() }
             .map { head -> head.getElementsByTag("title")

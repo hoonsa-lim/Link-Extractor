@@ -3,8 +3,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import java.net.MalformedURLException
-import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -22,12 +20,12 @@ class ExtractTest {
 
         //when
         runBlocking {
-            val link = linkExtractor.extractAll(url)
+            val link = linkExtractor.extractFavicon(url)
 
             //then
-            assertEquals(s, link.url.protocol)
-            assertEquals(d, link.url.authority)
-            assertEquals(su, link.url.file)
+            assertEquals(s, link.targetUrl.protocol)
+            assertEquals(d, link.targetUrl.authority)
+            assertEquals(su, link.targetUrl.file)
         }
     }
 
@@ -51,7 +49,7 @@ class ExtractTest {
             //when
             val exception = assertThrows<java.lang.IllegalArgumentException> {
                 runBlocking {
-                    linkExtractor.extractAll(url)
+                    linkExtractor.extractFavicon(url)
                 }
             }
 
@@ -85,7 +83,7 @@ class ExtractTest {
             //when
             val exception = assertThrows<java.lang.IllegalArgumentException> {
                 runBlocking {
-                    linkExtractor.extractAll(url)
+                    linkExtractor.extractFavicon(url)
                 }
             }
 
@@ -100,7 +98,6 @@ class ExtractTest {
     fun test_정상URL_추출_시_예외_미발생(){
         //given
         val allowUrl = listOf(
-            "http://www.ktword.co.kr/test/view/view.php?m_temp1=2340",
             "https://www.google.com/search?q=url+%ED%85%8C%EC%8A%BD&rlz=1C5CHFA_enKR984KR984&oq=url+%ED%85%8C%EC%8A%BD&aqs=chrome..69i57j35i39j0i131i433i512j0i20i263i512j0i67i131i433j69i60j69i61j69i60.1462j0j7&sourceid=chrome&ie=UTF-8",
             "https://hoy.kr/_hoy/"
         )
@@ -111,14 +108,14 @@ class ExtractTest {
             //when
             val link = assertDoesNotThrow {
                 runBlocking {
-                    linkExtractor.extractAll(url)
+                    linkExtractor.extractFavicon(url)
                 }
             }
 
             //then
-            assertTrue { (link.url.protocol ?: "") == "http" || (link.url.protocol ?: "") == "https" }
-            assertNotNull(link.url.authority)
-            assertNotNull(link.url.file)
+            assertTrue { (link.targetUrl.protocol ?: "") == "http" || (link.targetUrl.protocol ?: "") == "https" }
+            assertNotNull(link.targetUrl.authority)
+            assertNotNull(link.targetUrl.file)
         }
     }
 
@@ -155,8 +152,18 @@ class ExtractTest {
 //            val url = "https://developers-kr.googleblog.com/"
 //            val url = "https://techblog.woowahan.com/"
             val linkExtractor = LinkExtractor()
-            val link = linkExtractor.extractAll("https://www.google.com/")
+            val link = linkExtractor.extractFavicon("https://medium.com/daangn/search?q=android")
             println("link == $link")
+            println("link == ${link.targetUrl.protocol}")
+            println("link == ${link.targetUrl.file}")
+            println("link == ${link.targetUrl.authority}")
+            println("link == ${link.targetUrl.ref}")
+            println("link == ${link.targetUrl.query}")
+            println("link == ${link.targetUrl.port}")
+            println("link == ${link.targetUrl.path}")
+            println("link == ${link.targetUrl.host}")
+            println("link == ${link.targetUrl.userInfo}")
+            println("link == ${link.targetUrl.toString()}")
         }
     }
 }
