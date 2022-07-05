@@ -41,7 +41,7 @@ class LinkExtractor {
 
         return Favicon(url,
             faviconUrl = extractFaviconUrl(url),
-            faviconTitle = extractUrlTitle(url).first()
+            targetUrlTitle = extractUrlTitle(url).first()
         )
     }
 

@@ -51,7 +51,6 @@ class Medium(
 
             return flowOf(html)
                 .map {
-                    println("flow 1 map == $it")
                     it.getElementsByAttributeValueContaining("href", blog.blogId)
                 }
                 .filter {

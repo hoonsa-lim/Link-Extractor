@@ -1,25 +1,57 @@
 # Link-Extractor
 
-## Feature
-1. extract favicon from url
-2. extract title from url
+## Features
+### 1. extract favicon from url
+### 2. extract title from url
 
+---
 ## Dependencies
 1. jsoup
+   - version: 1.15.1
+   - https://github.com/jhy/jsoup
 2. coroutine
-
+   - version: 1.6.3
+   - https://github.com/Kotlin/kotlinx.coroutines
+---
 ## Usage
-### add dependencies (build.gradle) 
+### Add dependencies
+#### 1. gradle
 ```groovy
-
-dependencies {
-
-    //html parser
-    implementation 'org.jsoup:jsoup:1.15.1'
-
-    //coroutine
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3'
+//build.gradle(project)
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
 }
+
+//build.gradle(module)
+dependencies {
+    ...
+    implementation 'com.github.hoonsa-lim:Link-Extractor:0.1.3'
+}
+```
+#### 2. or maven
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+```xml
+<dependency>
+    <groupId>com.github.hoonsa-lim</groupId>
+    <artifactId>Link-Extractor</artifactId>
+    <version>0.1.3</version>
+</dependency>
+```
+
+
+### Option android - add permission (AndroidManifest.xml)
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
 ```
 
 ### Code
@@ -27,15 +59,13 @@ dependencies {
 val linkExtractor = LinkExtractor()
 
 runBlocking {
-    val link = linkExtractor.extract("https://m.naver.com/")
-    println("link == $link")
+    val result = linkExtractor.extractFavicon("https://m.naver.com/")
+    println("result == $result")
     
-    //link == Link(url=https://m.naver.com/, faviconUrl=https://m.naver.com/favicon.ico, title=NAVER)
+    // result == Favicon(
+    // targetUrl = https://m.naver.com/, 
+    // faviconUrl = https://m.naver.com/favicon.ico, 
+    // targetUrlTitle = NAVER
+    // )
 }
-```
-
-## option android
-### add permission (AndroidManifest.xml)
-```xml
-<uses-permission android:name="android.permission.INTERNET"/>
 ```
