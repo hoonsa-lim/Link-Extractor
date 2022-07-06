@@ -31,7 +31,7 @@ allprojects {
 //build.gradle(module)
 dependencies {
     ...
-    implementation 'com.github.hoonsa-lim:Link-Extractor:0.1.3'
+    implementation 'com.github.hoonsa-lim:Link-Extractor:0.2.0'
 }
 ```
 #### 2. or maven
