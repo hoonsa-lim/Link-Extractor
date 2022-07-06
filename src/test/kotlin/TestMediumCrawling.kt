@@ -26,10 +26,9 @@ class TestMediumCrawling : TestCrawling{
     @Test
     override fun test_입력한_키워드로_글_가져오기() {
         runBlocking {
-            System.setProperty("webdriver.chrome.driver", "/Users/hslim/Documents/MyData/programming/Util/chromedriver")
             val browser = ChromeBrowser("/Users/hslim/Documents/MyData/programming/Util/chromedriver").create()
-            val targetUrl = "https://medium.com/daangn/search?q=android"
-            val locator = By.xpath("//*[@id=\"root\"]/div/div[3]/div/div/main/div/div/div/div/div[2]/*/article/div/div/div/div/div/div[2]/div/div[1]/div/div/div/div/div[1]/div[1]/a")
+            val targetUrl = "https://www.google.com/search?q=kotlin"
+            val locator = By.xpath("//*[@id=\"rso\"]/div[1]/div/div[1]/div/a")
 
             SeleniumCrawler(browser, targetUrl, locator, 2000)
                 .runCrawling(10)

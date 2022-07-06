@@ -1,20 +1,23 @@
 # Link-Extractor
 
 ## Features
-### 1. extract favicon from url
-### 2. extract title from url
+### 1. crawling. use selenium on chrome
+### 2. extract favicon from url
+### 3. extract title from url
 
 ---
 ## Dependencies
 1. jsoup
    - version: 1.15.1
    - https://github.com/jhy/jsoup
-2. coroutine
+2. selenium (java, support)
+   - version: 4.3.0
+   - https://github.com/SeleniumHQ/selenium
+3. coroutine
    - version: 1.6.3
    - https://github.com/Kotlin/kotlinx.coroutines
 ---
-## Usage
-### Add dependencies
+## Add dependencies
 #### 1. gradle
 ```groovy
 //build.gradle(project)
@@ -54,7 +57,14 @@ dependencies {
 <uses-permission android:name="android.permission.INTERNET"/>
 ```
 
-### Code
+### Option Crawling - download chrome driver
+1. download chrome browser
+2. check chrome version -> chrome://settings/help
+3. download chrome driver -> https://chromedriver.chromium.org/downloads
+
+---
+## Code
+### 1. extract favicon and title
 ```kotlin
 val linkExtractor = LinkExtractor()
 
@@ -69,3 +79,25 @@ runBlocking {
     // )
 }
 ```
+
+### 2. crawling
+```kotlin
+runBlocking {
+   val browser = ChromeBrowser("/userChromeDriverPath/chromedriver").create()
+   val targetUrl = "https://www.google.com/search?q=kotlin"
+   val locator = By.xpath("//*[@id=\"rso\"]/div[1]/div/div[1]/div/a")
+   val delaySeconds = 2000      //for dynamic web page
+   
+   SeleniumCrawler(browser, targetUrl, locator, delaySeconds)       
+      .runCrawling(10)      //maximum seconds
+      .distinctUntilChanged()
+      .collect {
+         println("extracted url == ${it.getAttribute("href")}")
+      }
+}
+```
+---
+## Reference
+1. xpath
+   - https://en.wikipedia.org/wiki/XPath
+   - https://stackoverflow.com/questions/22571267/how-to-verify-an-xpath-expression-in-chrome-developers-tool-or-firefoxs-firebug
