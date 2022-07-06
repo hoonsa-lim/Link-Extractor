@@ -1,10 +1,13 @@
 import com.hoonsalim95.linkextractor.model.Blog
 import com.hoonsalim95.linkextractor.model.Favicon
 import com.hoonsalim95.linkextractor.platform.Medium
+import com.hoonsalim95.linkextractor.selenium_crawling.ChromeBrowser
+import com.hoonsalim95.linkextractor.selenium_crawling.SeleniumCrawler
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.distinctUntilChanged
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.openqa.selenium.By
 import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
@@ -23,20 +26,18 @@ class TestMediumCrawling : TestCrawling{
     @Test
     override fun test_입력한_키워드로_글_가져오기() {
         runBlocking {
-            val d = assertDoesNotThrow {
-                val result = this.async {
-                    target
-                        .crawling("android", 10, TimeUnit.SECONDS)
-                        .first()
-                }
+            System.setProperty("webdriver.chrome.driver", "/Users/hslim/Documents/MyData/programming/Util/chromedriver")
+            val browser = ChromeBrowser("/Users/hslim/Documents/MyData/programming/Util/chromedriver").create()
+            val targetUrl = "https://medium.com/daangn/search?q=android"
+            val locator = By.xpath("//*[@id=\"root\"]/div/div[3]/div/div/main/div/div/div/div/div[2]/*/article/div/div/div/div/div/div[2]/div/div[1]/div/div/div/div/div[1]/div[1]/a")
 
-                this.launch {
-                    val r = result.await()
-                    println("test result == $r")
-                    assertTrue { r.first().title.contains("당근") }
-
+            SeleniumCrawler(browser, targetUrl, locator, 2000)
+                .runCrawling(10)
+                .distinctUntilChanged()
+                .collect {
+                    println("result == ${it.getAttribute("href")}")
+                    assertTrue { it.getAttribute("href").contains("/daangn") }
                 }
-            }
         }
     }
 
